@@ -117,8 +117,8 @@ class MyServer(BaseHTTPRequestHandler):
                 # form_txt += '43<input type="radio" id="level43" name="level" value="43" required> / '
                 # form_txt += '44<input type="radio" id="level44" name="level" value="44" required> / '
                 form_txt += '45<input type="radio" id="level45" name="level" value="45" required> / '
-                form_txt += '46<input type="radio" id="level46" name="level" checked="checked" value="46" required> / '
-                form_txt += '47<input type="radio" id="level47" name="level" value="47" required> / '
+                form_txt += '46<input type="radio" id="level46(이미지 미완)" name="level" checked="checked" value="46" required> / '
+                form_txt += '47<input type="radio" id="level47(이미지 미완)" name="level" value="47" required> / '
                 form_txt += '48<input type="radio" id="level48" name="level" value="48" required> / '
                 form_txt += '49<input type="radio" id="level49" name="level" value="49" required> / '
                 form_txt += '50<input type="radio" id="level50" name="level" value="50" required> <br><br> '
@@ -200,9 +200,12 @@ class MyServer(BaseHTTPRequestHandler):
                          'CONTENT_TYPE':self.headers['Content-Type'],
                          })
             # get datalist using utf-8
-            pth = GenerateTable(form.getvalue("tomoID"), int(form.getvalue('level')), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), form.getvalue('diffkr'), form.getvalue('info'), form.getvalue('labelkr'))
+            diffkr = True if form.getvalue('diffkr') == "true" else False
+            info = True if form.getvalue('info') == "true" else False
+            labelkr = True if form.getvalue('labelkr') == "true" else False
+            pth = GenerateTable(form.getvalue("tomoID"), form.getvalue('level'), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), diffkr, info, labelkr)
             print("Generated Table at ", pth)
-            print(f"tomoID: {form.getvalue('tomoID')}, level: {form.getvalue('level')}, row: {form.getvalue('row')}, filter: {form.getvalue('filter')}, fmedal: {form.getvalue('fmedal')}, fscore: {form.getvalue('fscore')}, frank: {form.getvalue('frank')}, diffkr: {form.getvalue('diffkr')}, info: {form.getvalue('info')}, labelkr: {form.getvalue('labelkr')}")
+            print(f"tomoID: {form.getvalue('tomoID')}, level: {form.getvalue('level')}, row: {form.getvalue('row')}, filter: {form.getvalue('filter')}, fmedal: {form.getvalue('fmedal')}, fscore: {form.getvalue('fscore')}, frank: {form.getvalue('frank')}, diffkr: {diffkr}, info: {info}, labelkr: {labelkr}")
             self.send_response(200)
             self.send_header("content-type", "text/html; charset=utf-8\r\n")
             self.end_headers()
@@ -230,7 +233,7 @@ if __name__ == "__main__":
     sslctx.check_hostname = False
     sslctx.load_cert_chain(certfile='certificate.crt', keyfile="private.key")
     webServer.socket = sslctx.wrap_socket(webServer.socket, server_side=True)
-    print("Server started http://%s:%s" % (hostName, serverPort))
+    print("Server started https://%s:%s" % (hostName, serverPort))
 
     try:
         webServer.serve_forever()
