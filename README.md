@@ -17,9 +17,13 @@ image 내부에 곡의 자켓 이미지를 받아야 합니다. [https://remywik
 
 # Files
 `src/collect.js`: 팝픈 홈페이지에서 데이터 긁어오는 코드입니다. `https://otoge-flow-flow.com/` 여기 코드를 수정해 사용중입니다. (MIT License)
+
 `main.py`: 웹서버 기동하는 코드입니다.
+
 `tablegen.py`: 이미지를 생성해주는 코드인데 대충짜서 부끄러우니까 보지 마세요 😥
+
 `util.py`: 기타 유틸리티 코드입니다.
+
 `userdatautil.py`: 유저 데이터 불러와서 파싱하는 코드입니다.
 
 # 이미지만 생성하고 싶을 때
