@@ -203,7 +203,7 @@ class MyServer(BaseHTTPRequestHandler):
             diffkr = True if form.getvalue('diffkr') == "true" else False
             info = True if form.getvalue('info') == "true" else False
             labelkr = True if form.getvalue('labelkr') == "true" else False
-            pth = GenerateTable(form.getvalue("tomoID"), form.getvalue('level'), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), diffkr, info, labelkr)
+            pth = GenerateTable(form.getvalue("tomoID"), int(form.getvalue('level')), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), diffkr, info, labelkr)
             print("Generated Table at ", pth)
             print(f"tomoID: {form.getvalue('tomoID')}, level: {form.getvalue('level')}, row: {form.getvalue('row')}, filter: {form.getvalue('filter')}, fmedal: {form.getvalue('fmedal')}, fscore: {form.getvalue('fscore')}, frank: {form.getvalue('frank')}, diffkr: {diffkr}, info: {info}, labelkr: {labelkr}")
             self.send_response(200)

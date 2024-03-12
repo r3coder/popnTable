@@ -29,6 +29,7 @@ class SongDataElem:
 
 
 def GetPopClass(score, medal, level):
+    level = int(level)
     clearbonus = 0
     if medal in [1, 2, 3, 4]:
         clearbonus = 5000
