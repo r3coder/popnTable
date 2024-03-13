@@ -182,13 +182,13 @@
             case 'meda_g.png':
                 return 7;
             case 'meda_h.png':
-                return 8;
-            case 'meda_i.png':
                 return 9;
-            case 'meda_j.png':
+            case 'meda_i.png':
                 return 10;
-            case 'meda_k.png':
+            case 'meda_j.png':
                 return 11;
+            case 'meda_k.png':
+                return 8;
             case 'meda_none.png':
                 return -1;
             default:
