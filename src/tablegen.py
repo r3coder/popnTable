@@ -78,8 +78,8 @@ def GetElement(lvd, filtered=False, use_kr_label=True):
     if lvd.score >= 0:
         # Add alpha, fxxk this crazy shit
         img_medal = MEDAL_IMAGES[lvd.medal]
-        img_part = img[margin:img_medal.shape[0]+margin, margin:img_medal.shape[1]+margin]
-        img[margin:img_medal.shape[0]+margin, margin:img_medal.shape[1]+margin] = MergeImageAlpha(img_part, img_medal)
+        img_part = img[margin:img_medal.shape[0]+margin, margin+3:img_medal.shape[1]+margin+3]
+        img[margin:img_medal.shape[0]+margin, margin+3:img_medal.shape[1]+margin+3] = MergeImageAlpha(img_part, img_medal)
 
     ## Text drawing
     img_pil = Image.fromarray(img)
@@ -131,13 +131,15 @@ def GetElement(lvd, filtered=False, use_kr_label=True):
         img[:, :, 3] = 255
     return img
 
-def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_medal = 0, filter_score = 0, filter_rank = 0, output_path = None, use_diffkr = True, use_info = True, use_kr_label = True): 
+def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_medal = 0, filter_score = 0, filter_rank = 0, output_path = None, use_diffkr = True, use_info = True, use_kr_label = True, title = None, sort_method = "series"): 
 
 
     print("=====================================")
-    print(f"Level: {level}, Columns: {columns}, Filter: {filter_method}, Medal: {filter_medal}, Score: {filter_score}, Rank: {filter_rank}")
+    print(f" -- Table Generation Start")
 
     userdata = GetUserData(tomoID)
+
+    print(f" -- Loaded User Data")
 
     leveldata = []
     with open(f'leveldata/{level}.tsv', encoding='utf-8') as f:
@@ -168,6 +170,7 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
             lv = SongDataElem(line[0], level, line[2], line[3], line[7], line[9], line[10], line[8], isHardJudge, isHardGauge, score, medal, rank, popc)
             leveldata.append(lv)
 
+    print(f" -- Songdata Parsed: {len(leveldata)} songs found and matched userinfo for level table")
 
     lv_cnt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     lv_threshold = [0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.7, 0.6, 0.5, 0.6] # 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
@@ -210,6 +213,31 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
         lvd.subIndex = lv_cnt[lvd.diff]
         lv_cnt[lvd.diff] += 1
 
+    # if sort method is not sort_method, sort again
+    if sort_method != "series": # sort by each diff
+        elems = [None] * 12
+        for lvd in leveldata:
+            if elems[lvd.diff] is None:
+                elems[lvd.diff] = []
+            elems[lvd.diff].append(lvd)
+        leveldata = []
+        for elem in elems:
+            k = 0
+            if elem is None:
+                continue
+            if sort_method == "title":
+                elem.sort(key=lambda x: x.title)
+            elif sort_method == "score":
+                elem.sort(key=lambda x: x.score, reverse=True)
+            elif sort_method == "medal":
+                elem.sort(key=lambda x: x.medal, reverse=True)
+            for e in elem:
+                # assign sub-index
+                e.subIndex = k
+                k += 1
+            leveldata += elem
+
+
     v_total = len(leveldata)
     v_filtered = len([lvd for lvd in leveldata if lvd.is_filtered])
 
@@ -217,6 +245,8 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
         leveldata = [lvd for lvd in leveldata if not lvd.is_filtered]
 
     # full_image = np.zeros((HEIGHT * (len(leveldata)//columns+1), WIDTH * columns, 4), dtype=np.uint8)
+
+    print(f" -- Data Loaded, {v_total} songs found, {v_filtered} songs filtered out")
 
     FRAME = 20
     TABLESTARTV = 340
@@ -240,7 +270,10 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
     img_pil = Image.fromarray(full_image)
     draw = ImageDraw.Draw(img_pil)
     font = ImageFont.truetype("font/KR.TTF", 90)
-    draw.text((40, 50), f"챱챱뮤직 {level}렙 도표", font=font, fill=(255, 255, 255, 255), stroke_width=2, stroke_fill='black')
+    if title is not None and len(title) > 0:
+        draw.text((40, 50), title, font=font, fill=(255, 255, 255, 255), stroke_width=2, stroke_fill='black')
+    else:
+        draw.text((40, 50), f"챱챱뮤직 {level}렙 도표", font=font, fill=(255, 255, 255, 255), stroke_width=2, stroke_fill='black')
     font = ImageFont.truetype("font/KR.TTF", 60)
     n = userdata['profile'][0]
     draw.text((40, 150), f"유저:{n}", font=font, fill=(255, 255, 255, 255), stroke_width=2, stroke_fill='black')
@@ -277,7 +310,7 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
     fin_d = userdata['profile'][6].replace('時頃','시')
     draw.text((1000, 60), f"최종갱신 {fin_d}", font=font, fill=(255, 255, 255, 255), stroke_width=2, stroke_fill='black')
     font = ImageFont.truetype("font/KR.TTF", 28)
-    draw.text((10, 10), f"메달 이미지: popn.gg, 곡 이미지: remywiki.com / popnmusic.fandom.com, 한국 서열표 : @popnmusic10", font=font, fill=(180, 180, 180, 255), stroke_width=2, stroke_fill='black')
+    draw.text((10, 10), f"곡 이미지: remywiki.com / popnmusic.fandom.com, 한국 서열표: @popnmusic10, 난이도값: popn.wiki", font=font, fill=(180, 180, 180, 255), stroke_width=2, stroke_fill='black')
     font = ImageFont.truetype("font/KR.TTF", 40)
     if use_info:
         creds = int(userdata['profile'][3]) + int(userdata['profile'][4]) + int(userdata['profile'][5])
@@ -322,10 +355,10 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
                 f_out += f'_rank{filter_rank}'
         else:
             pass
-        if arg.use_diffkr:
+        if use_diffkr:
             f_out += '_kr'
         f_out += '.png'
 
     cv2.imwrite(f_out, full_image)
-    print(f"Output to {f_out}")
+    print(f" -- Table generated, and output to {f_out}")
     return f_out
