@@ -10,6 +10,19 @@ hostName = "r3c0d3r.mooo.com"
 serverPort = 3000
 from tablegen import GenerateTable
 
+class Logger:
+    def __init__(self, path):
+        self.path = path
+
+    def print(self, *args):
+        with open(self.path, "a", encoding='utf-8') as file:
+            t = time.strftime("[%Y-%m-%d %H:%M:%S] ", time.localtime())
+            file.write(t + " ".join(args) + "\n")
+        print(*args)
+# Time as YYYYMMDD_HHMMSS
+import datetime
+t = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+logger = Logger(f"logs/{t}.log")
 
 class MyServer(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -59,6 +72,8 @@ class MyServer(BaseHTTPRequestHandler):
             form_txt += '<input type="submit" value="제출">'
             form_txt += '</form>'
             self.wfile.write(bytes(form_txt, "utf-8"))
+            self.wfile.write(bytes('<br>', "utf-8"))
+            self.wfile.write(bytes('<p>Source code: <a href="https://github.com/r3coder/popnTable">Github</a></p>', "utf-8"))
 
     
     def do_POST(self):
@@ -77,7 +92,7 @@ class MyServer(BaseHTTPRequestHandler):
                 userdata = form.getvalue("datalist")
                 userdata = urllib.parse.unquote(userdata)
                 userdata = json.loads(userdata)
-                print("Detected User:", userdata['profile'][0])
+                logger.print("[Submit] Detected User (New/Reload):", userdata['profile'][0])
                 # Save data to userdata/{userdata['profile'][1]}.json
                 with open(f"userdata/{userdata['profile'][1]}.json", "w", encoding='utf-8') as file:
                     file.write(json.dumps(userdata))
@@ -89,10 +104,10 @@ class MyServer(BaseHTTPRequestHandler):
                     with open(f"userdata/{userdata}.json", "r", encoding='utf-8') as file:
                         userdata = file.read()
                         userdata = json.loads(userdata)
-                        print("Detected User:", userdata['profile'][0])
+                        logger.print("[Submit] Detected User (By ID):", userdata['profile'][0])
                         flag_detected = True
                 else:
-                    print("Detected User: Unknown (NOT FOUND)")
+                    logger.print("[Submit] User not found")
 
             # Print response
             self.send_response(200)
@@ -111,37 +126,29 @@ class MyServer(BaseHTTPRequestHandler):
                 self.wfile.write(bytes(f"<h2>도표 설정</h2>", "utf-8"))
                 form_txt = '<form action="/table" method="post">'
                 form_txt += '<h3>기본 설정</h3>'
+                form_txt += '41, 42, 43, 44, 46, 47, 48은 곡 이미지 표시가 안 됩니다. <br>'
+                form_txt += '46 이상부터 한국 서열표 이용이 가능합니다. <br>'
+                form_txt += '46, 47은 한국 서열표가 업데이트 덜 되었습니다. <br>'
                 form_txt += '<label for="level0">레벨: </label>'
-                # form_txt += '41<input type="radio" id="level41" name="level" value="41" required> / '
-                # form_txt += '42<input type="radio" id="level42" name="level" value="42" required> / '
-                # form_txt += '43<input type="radio" id="level43" name="level" value="43" required> / '
-                # form_txt += '44<input type="radio" id="level44" name="level" value="44" required> / '
+                form_txt += '41<input type="radio" id="level41" name="level" value="41" required> / '
+                form_txt += '42<input type="radio" id="level42" name="level" value="42" required> / '
+                form_txt += '43<input type="radio" id="level43" name="level" value="43" required> / '
+                form_txt += '44<input type="radio" id="level44" name="level" value="44" required> / '
                 form_txt += '45<input type="radio" id="level45" name="level" value="45" required> / '
-                form_txt += '46<input type="radio" id="level46(이미지 미완)" name="level" checked="checked" value="46" required> / '
-                form_txt += '47<input type="radio" id="level47(이미지 미완)" name="level" value="47" required> / '
+                form_txt += '46<input type="radio" id="level46" name="level" checked="checked" value="46" required> / '
+                form_txt += '47<input type="radio" id="level47" name="level" value="47" required> / '
                 form_txt += '48<input type="radio" id="level48" name="level" value="48" required> / '
                 form_txt += '49<input type="radio" id="level49" name="level" value="49" required> / '
                 form_txt += '50<input type="radio" id="level50" name="level" value="50" required> <br><br> '
-                
-                form_txt += '<label for="row">줄 너비 (모바일:4, 기타:8~12): </label>'
-                form_txt += '<input type="range" id="row" value="4" min="4" max="14" name="row" oninput="this.nextElementSibling.value = this.value">  '
-                form_txt += '<output>4</output><br><br>'
 
                 form_txt += '<label for="diffkr0">사용 난이도표 (45 이하는 팝픈위키만 가능합니다):   </label>'
                 form_txt += '팝픈위키 서열값<input type="radio" name="diffkr" id="diffkr0" value="false" checked="checked" required> / '
                 form_txt += '한국 서열표<input type="radio" name="diffkr" id="diffkr1" value="true" required>  <br><br>'
 
-                form_txt += '<label for="info0">플레이 수, 팝토모 아이디 표시:   </label>'
-                form_txt += '표시 안함<input type="radio" name="info" id="info0" value="false" required> / '
-                form_txt += '정보 표시<input type="radio" name="info" id="info1" value="true" checked="checked" required>  <br><br>'
-
-                form_txt += '<label for="labelkr0">곡 표시제목:   </label>'
-                form_txt += '일본어 원문<input type="radio" name="labelkr" id="labelkr0" value="false" required> / '
-                form_txt += '한국어 곡명(별명)<input type="radio" name="labelkr" id="labelkr1" value="true" checked="checked" required>  <br>'
-
                 form_txt += '<h3>필터 설정</h3>'
                 
                 form_txt += '필터를 적용할 경우, 설정된 메달/점수/랭크보다 높은 것에 적용됩니다. <br>'
+                form_txt += '필터를 적용하고 싶을 경우, 필터 방법에 꼭 필터 어둡게 / 도표에서 제거를 눌러주세요. <br>'
                 form_txt += '메달/점수/랭크 필터 중 하나만 적용하는 것을 추천합니다. <br><br>'
 
                 form_txt += '<label for="filter0">필터 방법:   </label>'
@@ -180,6 +187,30 @@ class MyServer(BaseHTTPRequestHandler):
 
                 form_txt += f'<input type="hidden" id="tomoID" name="tomoID" value="{userdata["profile"][1]}">'
 
+                form_txt += '<h3>기타 설정</h3>'
+                
+                form_txt += '<label for="title">원하는 제목 (빈칸일시 기본값 사용): </label>'
+                form_txt += '<input type="text" id="title" name="title" value="">  <br><br>'
+
+                form_txt += '<label for="row">한 가로줄당 채보 수 (모바일: 4 추천 / 데스크탑: 8~12 추천 / 49, 50레벨: 4 추천): </label>'
+                form_txt += '<input type="range" id="row" value="4" min="4" max="14" name="row" oninput="this.nextElementSibling.value = this.value">  '
+                form_txt += '<output>4</output><br><br>'
+                
+                form_txt += '<label for="info0">플레이 수, 팝토모 아이디 표시:   </label>'
+                form_txt += '표시 안함<input type="radio" name="info" id="info0" value="false" required> / '
+                form_txt += '정보 표시<input type="radio" name="info" id="info1" value="true" checked="checked" required>  <br><br>'
+
+                form_txt += '<label for="labelkr0">곡 표시제목:   </label>'
+                form_txt += '일본어 원문<input type="radio" name="labelkr" id="labelkr0" value="false" required> / '
+                form_txt += '한국어 곡명(별명)<input type="radio" name="labelkr" id="labelkr1" value="true" checked="checked" required>  <br><br>'
+
+                form_txt += '<label for="sort0">정렬 방법:   </label>'
+                form_txt += '시리즈<input type="radio" name="sort" id="sort0" value="series" required> / '
+                form_txt += '일본어 제목<input type="radio" name="sort" id="sort1" value="title" checked="checked" required> / '
+                form_txt += '점수<input type="radio" name="sort" id="sort2" value="score" required> / '
+                form_txt += '메달<input type="radio" name="sort" id="sort3" value="medal" required>  <br><br>'
+                form_txt += '<br>'
+                
                 form_txt += '<input type="submit" value="표 출력 (15초 정도 걸립니다)">'
                 form_txt += '</form>'
                 self.wfile.write(bytes(form_txt, "utf-8"))
@@ -203,9 +234,14 @@ class MyServer(BaseHTTPRequestHandler):
             diffkr = True if form.getvalue('diffkr') == "true" else False
             info = True if form.getvalue('info') == "true" else False
             labelkr = True if form.getvalue('labelkr') == "true" else False
-            pth = GenerateTable(form.getvalue("tomoID"), int(form.getvalue('level')), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), diffkr, info, labelkr)
-            print("Generated Table at ", pth)
-            print(f"tomoID: {form.getvalue('tomoID')}, level: {form.getvalue('level')}, row: {form.getvalue('row')}, filter: {form.getvalue('filter')}, fmedal: {form.getvalue('fmedal')}, fscore: {form.getvalue('fscore')}, frank: {form.getvalue('frank')}, diffkr: {diffkr}, info: {info}, labelkr: {labelkr}")
+            if int(form.getvalue('level')) < 46:
+                diffkr = False
+            # Check time for generation
+            t0 = time.time()
+            pth = GenerateTable(form.getvalue("tomoID"), int(form.getvalue('level')), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), diffkr, info, labelkr, form.getvalue("title"), form.getvalue("sort"))
+            t1 = time.time()
+            logger.print(f"[Table Generated] @ {pth}, Elapsed time: {t1-t0:.2f}s")
+            logger.print(f"  Args: tomoID: {form.getvalue('tomoID')}, level: {form.getvalue('level')}, row: {form.getvalue('row')}, filter: {form.getvalue('filter')}, fmedal: {form.getvalue('fmedal')}, fscore: {form.getvalue('fscore')}, frank: {form.getvalue('frank')}, diffkr: {diffkr}, info: {info}, labelkr: {labelkr}, title: {form.getvalue('title')}, sort: {form.getvalue('sort')}")
             self.send_response(200)
             self.send_header("content-type", "text/html; charset=utf-8\r\n")
             self.end_headers()
@@ -233,7 +269,7 @@ if __name__ == "__main__":
     sslctx.check_hostname = False
     sslctx.load_cert_chain(certfile='certificate.crt', keyfile="private.key")
     webServer.socket = sslctx.wrap_socket(webServer.socket, server_side=True)
-    print("Server started https://%s:%s" % (hostName, serverPort))
+    logger.print("Server started https://%s:%s" % (hostName, serverPort))
 
     try:
         webServer.serve_forever()
