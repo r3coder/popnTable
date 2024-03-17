@@ -484,7 +484,7 @@
                         // a.download = `${json.profile[1]}.json`;
                         // a.download = `data.json`;
                         // a.click();
-                        post('https://r3c0d3r.mooo.com:3000/submit', json);
+                        post('https://popntable.mooo.com:3000/submit', json);
                     });
                 });
             }

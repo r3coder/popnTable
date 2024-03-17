@@ -15,7 +15,9 @@ DIFFJP = ["弱", "中", "強", "詐"]
 
 DIFFKR = ["보스", "최상", "상", "중상", "중", "중하", "하", "최하", "개인", "?"]
 
-DIFFJP = ["보스\n~+1.0", "최상\n+1.0\n~+.66", "상\n+.66\n~+.33", "중상\n+.33\n~+0.0", "중\n-0.0\n~-.33", "중하\n-.33\n~-.66", "하\n-.66\n~-1.0", "최하\n-1.0~", "개인", "미배정"]
+# DIFFJP = ["보스\n~+1.0", "최상\n+1.0\n~+.66", "상\n+.66\n~+.33", "중상\n+.33\n~+0.0", "중\n-0.0\n~-.33", "중하\n-.33\n~-.66", "하\n-.66\n~-1.0", "최하\n-1.0~", "개인", "미배정"]
+
+DIFFJP = ["사칭\n~+1.0", "최상\n+1.0\n~+0.7", "상\n+0.7\n~+0.4", "중+\n+0.4\n~+0.0", "중-\n-0.0\n~-0.4", "하\n-0.4\n~-0.7", "최하\n-0.7\n~-1.0", "역사칭\n-1.0~", "개인", "미배정"]
 
 from util import GetDiffText, SongDataElem, GetPopClass
 from userdatautil import GetUserData, FindSongData
@@ -34,22 +36,51 @@ for i in range(1, 13):
     if os.path.exists(f'./medal/{i}.png'):
         medal_image = cv2.imread(f'./medal/{i}.png', cv2.IMREAD_UNCHANGED)
     else:
-        medal_image = cv2.imread(f'./medal/0.png', cv2.IMREAD_UNCHANGED)
+        medal_image = cv2.imread(f'./medal/12.png', cv2.IMREAD_UNCHANGED)
     # remove alpha channel
 
     medal_image = cv2.resize(medal_image, (60, 60))
     # TODO : Why black background?
     MEDAL_IMAGES.append(medal_image)
 
+# Load medal images
+MEDAL_IMAGES_KAWAII = []
+MEDAL_IMAGES_KAWAII.append([])
+for i in range(1, 13):
+    if os.path.exists(f'./medal/{i}e.png'):
+        medal_image = cv2.imread(f'./medal/{i}e.png', cv2.IMREAD_UNCHANGED)
+    else:
+        medal_image = cv2.imread(f'./medal/12.png', cv2.IMREAD_UNCHANGED)
+    # remove alpha channel
+
+    medal_image = cv2.resize(medal_image, (60, 60))
+    # TODO : Why black background?
+    MEDAL_IMAGES_KAWAII.append(medal_image)
+
 UPPER_IMAGE = cv2.imread(f'./image/_UPPER.png', cv2.IMREAD_UNCHANGED) # 87x60
 
 WIDTH = 336
 HEIGHT = 120
 
-def GetElement(lvd, filtered=False, use_kr_label=True):
+def GetElement(lvd, filtered=False, use_kr_label=True, kawaii = True):
     img = np.zeros((HEIGHT, WIDTH, 4), dtype=np.uint8)
-    # Fill image with gray, alpha=255
-    img[:, :, 0:3] = 140
+    # Fill image with desired color
+    if lvd.level <= 48:
+        if "(EX)" in lvd.genre: #BGR
+            img[:, :, 2] = 240
+            img[:, :, 1] = 160
+            img[:, :, 0] = 160
+        elif "(H)" in lvd.genre:
+            img[:, :, 2] = 241
+            img[:, :, 1] = 215
+            img[:, :, 0] = 159
+        else:
+            img[:, :, 2] = 180
+            img[:, :, 1] = 241
+            img[:, :, 0] = 159
+    else: # Single color
+        img[:, :, 0:3] = 200
+
     img[:, :, 3] = 255
     # Load image from lv.image and place it to 70,0
     if len(lvd.image) > 0 and os.path.exists(f'image/{lvd.image}'):
@@ -76,11 +107,14 @@ def GetElement(lvd, filtered=False, use_kr_label=True):
 
     
     if lvd.score >= 0:
-        # Add alpha, fxxk this crazy shit
-        img_medal = MEDAL_IMAGES[lvd.medal]
-        img_part = img[margin:img_medal.shape[0]+margin, margin+3:img_medal.shape[1]+margin+3]
-        img[margin:img_medal.shape[0]+margin, margin+3:img_medal.shape[1]+margin+3] = MergeImageAlpha(img_part, img_medal)
-
+        if kawaii:
+            img_medal = MEDAL_IMAGES_KAWAII[lvd.medal]
+        else:
+            img_medal = MEDAL_IMAGES[lvd.medal]
+    else:
+        img_medal = MEDAL_IMAGES[12]
+    img_part = img[margin:img_medal.shape[0]+margin, margin:img_medal.shape[1]+margin]
+    img[margin:img_medal.shape[0]+margin, margin:img_medal.shape[1]+margin] = MergeImageAlpha(img_part, img_medal)
     ## Text drawing
     img_pil = Image.fromarray(img)
     draw = ImageDraw.Draw(img_pil)
@@ -131,7 +165,7 @@ def GetElement(lvd, filtered=False, use_kr_label=True):
         img[:, :, 3] = 255
     return img
 
-def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_medal = 0, filter_score = 0, filter_rank = 0, output_path = None, use_diffkr = True, use_info = True, use_kr_label = True, title = None, sort_method = "series"): 
+def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_medal = 0, filter_score = 0, filter_rank = 0, output_path = None, use_diffkr = True, use_info = True, use_kr_label = True, title = None, sort_method = "series", kawaiimedal = True, better = True): 
 
 
     print("=====================================")
@@ -158,15 +192,10 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
             # Find user data
             sd = FindSongData(line[2], line[3], userdata)
             if sd is not None: # Medal Rank Score
-                score = sd[2]
-                medal = sd[0]
-                rank = sd[1]
-                popc = GetPopClass(score, medal, level)
+                score, medal, rank = sd[2], sd[0], sd[1]
+                popc = GetPopClass(score, medal, int(level))
             else:
-                score = -1
-                medal = -1
-                rank = -1
-                popc = -1
+                score, medal, rank, popc = -1, -1, -1, -1
             lv = SongDataElem(line[0], level, line[2], line[3], line[7], line[9], line[10], line[8], isHardJudge, isHardGauge, score, medal, rank, popc)
             leveldata.append(lv)
 
@@ -177,27 +206,50 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
     def ParseDiffJP(diffJP, lv):
         if len(diffJP) == 0:
             return 9
-        # split bt ( and ±
-        dv = diffJP.split("(")[1].split("±")
-        abso = float(dv[0])
-        rela = float(dv[1].split(")")[0])
-        if rela >= lv_threshold[lv-41]:
-            return 8
+        if "個人差" in diffJP:
+            return 8 
+        # 詐称, 強, 中, 弱, 逆詐称
+        try:
+            dv = diffJP.split("(")[1].split("±")
+            abso = float(dv[0])
+            # rela = float(dv[1].split(")")[0])
+        except:
+            return 9
         if abso >= 1:
             return 0
-        elif abso <= -1:
-            return 7
+        elif abso >= 0.7:
+            return 1
+        elif abso >= 0.4:
+            return 2
+        elif abso >= 0:
+            return 3
+        elif abso >= -0.4:
+            return 4
+        elif abso >= -0.7:
+            return 5
+        elif abso >= -1:
+            return 6
         else:
-            return int(4 - abso*3)
+            return 7
+
+    v_total = len(leveldata)
 
     for lvd in leveldata:
         if filter_method != 'none':
-            if filter_medal >= lvd.medal:
-                lvd.is_filtered = True
-            if filter_score >= lvd.score:
-                lvd.is_filtered = True
-            if filter_rank >= lvd.rank:
-                lvd.is_filtered = True
+            if better:
+                if filter_medal != 0 and filter_medal >= lvd.medal:
+                    lvd.is_filtered = True
+                if filter_score != 0 and filter_score >= lvd.score:
+                    lvd.is_filtered = True
+                if filter_rank != 0 and filter_rank >= lvd.rank:
+                    lvd.is_filtered = True
+            else:
+                if filter_medal != 0 and filter_medal <= lvd.medal:
+                    lvd.is_filtered = True
+                if filter_score != 0 and filter_score <= lvd.score:
+                    lvd.is_filtered = True
+                if filter_rank != 0 and filter_rank <= lvd.rank:
+                    lvd.is_filtered = True
         if lvd.score < 0:
             lvd.is_filtered = False
         if filter_method == 'disable' and lvd.is_filtered:
@@ -208,15 +260,20 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
             else:
                 lvd.diff = 9
         else:
-            lvd.diff = ParseDiffJP(lvd.diffJP, level)
+            lvd.diff = ParseDiffJP(lvd.diffJP, int(level))
 
         lvd.subIndex = lv_cnt[lvd.diff]
         lv_cnt[lvd.diff] += 1
 
+    v_filtered = len([lvd for lvd in leveldata if lvd.is_filtered])
+
+    
     # if sort method is not sort_method, sort again
     if sort_method != "series": # sort by each diff
         elems = [None] * 12
         for lvd in leveldata:
+            if filter_method == 'disable' and lvd.is_filtered:
+                continue
             if elems[lvd.diff] is None:
                 elems[lvd.diff] = []
             elems[lvd.diff].append(lvd)
@@ -227,10 +284,16 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
                 continue
             if sort_method == "title":
                 elem.sort(key=lambda x: x.title)
+                # send english / number to back
+                for i in range(len(elem)):
+                    if ord(elem[0].title[0]) < 128:
+                        elem.append(elem.pop(0))
+                
             elif sort_method == "score":
                 elem.sort(key=lambda x: x.score, reverse=True)
             elif sort_method == "medal":
                 elem.sort(key=lambda x: x.medal, reverse=True)
+            
             for e in elem:
                 # assign sub-index
                 e.subIndex = k
@@ -238,8 +301,6 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
             leveldata += elem
 
 
-    v_total = len(leveldata)
-    v_filtered = len([lvd for lvd in leveldata if lvd.is_filtered])
 
     if filter_method == 'disable':
         leveldata = [lvd for lvd in leveldata if not lvd.is_filtered]
@@ -288,9 +349,9 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
         if filter_rank > 0:
             txt += f"랭크 {RANK[filter_rank]} 이상 "
         if filter_method == 'darken':
-            txt += f"어둡게 ({v_filtered}/{v_total})"
+            txt += f"어둡게 ({v_total}곡 중 {v_total-v_filtered}곡 남음)"
         elif filter_method == 'disable':
-            txt += f"미표시 ({v_filtered}/{v_total})"
+            txt += f"미표시 ({v_total}곡 중 {v_total-v_filtered}곡 남음)"
 
     draw.text((40, 220), txt, font=font, fill=(255, 255, 255, 255), stroke_width=2, stroke_fill='black')
     font = ImageFont.truetype("font/KR.TTF", 40)
@@ -335,7 +396,7 @@ def GenerateTable(tomoID, level, columns = 8, filter_method = "none", filter_med
         full_image = np.array(img_pil)
 
     for lvd in leveldata:
-        im = GetElement(lvd, lvd.is_filtered, use_kr_label)
+        im = GetElement(lvd, lvd.is_filtered, use_kr_label, kawaiimedal)
         # Add image to full_image
         row = (lvd.subIndex // columns)*HEIGHT + partStart[lvd.diff]
         col = (lvd.subIndex % columns)*WIDTH + TABLESTARTH + BORDER

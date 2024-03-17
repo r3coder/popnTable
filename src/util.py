@@ -19,6 +19,8 @@ class SongDataElem:
         self.rank = rank
         self.popclass = popc
         self.is_filtered = False
+        self.diff = 0
+        self.subIndex = -1
     
     def IsUpper(self):
         if "(UPPER)" in self.genre:
@@ -40,7 +42,8 @@ def GetPopClass(score, medal, level):
     return int(popc*100+0.5)/100
 
 def GetDiffText(genre):
-    x = "" if "(UPPER)" not in genre else "[UPPER]"
+    x = "" if "(UPPER)" not in genre else "어퍼"
+    x = ""
     if "(EX)" in genre:
         return x
     elif "(H)" in genre:
@@ -49,16 +52,6 @@ def GetDiffText(genre):
         return x+"ⓝ"
     else:
         return x+""
-
-def CompareTitle(a, b):
-    rep = {"“":'"', "”":'"', "　":" ", "…":"...", "＠":"@", "～":"~", "(EX)":"", "〜":"~",
-        "Ａ":"A", "Ｂ":"B", "Ｃ":"C", "Ｄ":"D", "Ｅ":"E", "Ｆ":"F", "Ｇ":"G", "Ｈ":"H", "Ｉ":"I", "Ｊ":"J", "Ｋ":"K", "Ｌ":"L", "Ｍ":"M", "Ｎ":"N", "Ｏ":"O", "Ｐ":"P", "Ｑ":"Q", "Ｒ":"R", "Ｓ":"S", "Ｔ":"T", "Ｕ":"U", "Ｖ":"V", "Ｗ":"W", "Ｘ":"X", "Ｙ":"Y", "Ｚ":"Z", "ａ":"a", "ｂ":"b", "ｃ":"c", "ｄ":"d", "ｅ":"e", "ｆ":"f", "ｇ":"g", "ｈ":"h", "ｉ":"i", "ｊ":"j", "ｋ":"k", "ｌ":"l", "ｍ":"m", "ｎ":"n", "ｏ":"o", "ｐ":"p", "ｑ":"q", "ｒ":"r", "ｓ":"s", "ｔ":"t", "ｕ":"u", "ｖ":"v", "ｗ":"w", "ｘ":"x", "ｙ":"y", "ｚ":"z", "０":"0", "１":"1", "２":"2", "３":"3", "４":"4", "５":"5", "６":"6", "７":"7", "８":"8", "９":"9", "＠":"@", "＃":"#", "＄":"$", "％":"%", "＾":"^", "＆":"&", "＊":"*", "（":"(", "）":")", "＿":"_", "＋":"+", "－":"-", "＝":"=", "｛":"{", "｝":"}", "｜":"|", "［":"[", "］":"]", "：":":", "；":";", "＂":'"', "’":"'", "，":",", "．":".", "／":"/", "＜":"<", "＞":">", "？":"?", "！":"!", " ":""}
-
-    for k, v in rep.items():
-        a = a.replace(k, v)
-        b = b.replace(k, v)
-    if a.lower() == b.lower():
-        return True
 
 
 def GetRankColor(rank):

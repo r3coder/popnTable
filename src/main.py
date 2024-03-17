@@ -57,23 +57,29 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes('<p>자신의 데이터를 넣은 레벨별 팝픈뮤직 도표를 생성합니다.</p>', "utf-8"))
             self.wfile.write(bytes('<p>문의 : <a href="x.com/r3c0d3r">@r3c0d3r</a> / 디스코드 @r3c0d3r</p>' , "utf-8"))
             # add button
-            self.wfile.write(bytes('<h2>사용 방법</h2>', "utf-8"))
+            self.wfile.write(bytes('<h2>데이터 등록/갱신</h2>', "utf-8"))
             self.wfile.write(bytes('<p>0. 베이직 코스 가입이 필요합니다.</p>', "utf-8"))
             self.wfile.write(bytes('<p>1. <a href="https://p.eagate.573.jp/gate/p/mypage/index.html">코나미 페이지</a>에 로그인 해 주세요.</p>', "utf-8"))
-            self.wfile.write(bytes('<p>2. 개발자 도구 (크롬 기준 F12)를 누른 뒤, Console에 아래 내용을 복사-붙여넣기 후 엔터를 눌러 주세요.</p>', "utf-8"))
-            self.wfile.write(bytes('<p>2-a. 페이지가 안전하지 않다거나 전송되는 데이터가 안전하지 않다는 메세지는 제가 이 서버 인증서 받기 귀찮아서 그런거니, 대충 진행해 주세요.</p>', "utf-8"))
-            self.wfile.write(bytes("<p>javascript:(()=>{const d=new Date();const s=document.createElement('script');s.src='https://r3c0d3r.mooo.com:3000/collect.js';document.head.appendChild(s);})();", "utf-8"))
-            self.wfile.write(bytes("<p>본 기능을 사용하는 것으로 버그 분석 및 통계를 위해 다음과 같은 정보가 수집되는 것에 동의하는 것으로 간주합니다.<br>p.eagate.573.jp를 통해 수집되는 플레이어명, 팝토모 ID, 사용 캐릭터명, 플레이 횟수, 최종 플레이 일시, 악곡 데이터</p>", "utf-8"))
+            self.wfile.write(bytes('<p>2-a. 아래 스크립트를 복사하고, 주소창에 붙여넣어주세요. 주소창이 javascript:로 시작하지 않는다면, 앞에 javascript:를 붙이고 코드를 붙여넣어주세요.</p>', "utf-8"))
+            self.wfile.write(bytes('<p>2-b. 위 방법이 안 되면, 개발자 도구 (크롬 기준 F12)를 누른 뒤, Console에 아래 내용을 복사-붙여넣기 후 엔터를 눌러 주세요.</p>', "utf-8"))
+            self.wfile.write(bytes("<p>javascript:(()=>{const d=new Date();const s=document.createElement('script');s.src='https://popntable.mooo.com:3000/collect.js';document.head.appendChild(s);})();</p>", "utf-8"))
+            self.wfile.write(bytes('<p>3. 스크립트 실행이 완료되면, 자동으로 테이블 생성 페이지로 이동됩니다.</p><br>', "utf-8"))
+            self.wfile.write(bytes("<p>본 기능을 사용하는 것으로 도표 작성, 버그 분석 및 통계를 위해 다음과 같은 정보가 수집되는 것에 동의하는 것으로 간주됩니다.<br>p.eagate.573.jp를 통해 수집되는 악곡 플레이 데이터, 플레이어명, 팝토모 ID, 사용 캐릭터명, 플레이 횟수, 최종 플레이 일시</p>", "utf-8"))
             self.wfile.write(bytes("<h2>데이터 등록한 적 있는 경우</h2>", "utf-8"))
+            self.wfile.write(bytes('<p>위 데이터 등록을 진행한 경우, 팝토모 아이디를 입력하는 것으로 해당 데이터로 여러 개의 테이블을 출력할 수 있습니다.</p>', "utf-8"))
+            self.wfile.write(bytes('<p>만일 최근 플레이 데이터로 업뎃이 필요한 경우, 데이터 등록/갱신에 있는대로 다시 갱신해 주세요.</p>', "utf-8"))
             self.wfile.write(bytes('<p>갱신 없이 표만 뽑으려면, 아래에 팝토모 아이디를 "-"까지 정확히 입력후 입력을 누르세요.</p>', "utf-8"))
             form_txt = '<form action="/submit" method="post">'
             form_txt += '<label for="datalist">팝토모 아이디: </label>'
-            form_txt += '<input type="text" id="datalist" name="datalist" required><br>'
-            form_txt += '<input type="submit" value="제출">'
+            form_txt += '<input type="text" id="datalist" name="datalist" required>     '
+            form_txt += '<input type="submit" value="팝토모 아이디로 테이블 생성">'
             form_txt += '</form>'
             self.wfile.write(bytes(form_txt, "utf-8"))
             self.wfile.write(bytes('<br>', "utf-8"))
-            self.wfile.write(bytes('<p>Source code: <a href="https://github.com/r3coder/popnTable">Github</a></p>', "utf-8"))
+            self.wfile.write(bytes("<h2>데이터 삭제를 희망하는 경우</h2>", "utf-8"))
+            self.wfile.write(bytes('<p>서버에 저장된 플레이 데이터 삭제를 희망하는 경우, 위 문의처에 문의 바랍니다. (기능 구현중)</p>', "utf-8"))
+            self.wfile.write(bytes('<br>', "utf-8"))
+            self.wfile.write(bytes('<p>소스 코드: <a href="https://github.com/r3coder/popnTable">Github</a></p>', "utf-8"))
 
     
     def do_POST(self):
@@ -126,9 +132,6 @@ class MyServer(BaseHTTPRequestHandler):
                 self.wfile.write(bytes(f"<h2>도표 설정</h2>", "utf-8"))
                 form_txt = '<form action="/table" method="post">'
                 form_txt += '<h3>기본 설정</h3>'
-                form_txt += '41, 42, 43, 44, 46, 47, 48은 곡 이미지 표시가 안 됩니다. <br>'
-                form_txt += '46 이상부터 한국 서열표 이용이 가능합니다. <br>'
-                form_txt += '46, 47은 한국 서열표가 업데이트 덜 되었습니다. <br>'
                 form_txt += '<label for="level0">레벨: </label>'
                 form_txt += '41<input type="radio" id="level41" name="level" value="41" required> / '
                 form_txt += '42<input type="radio" id="level42" name="level" value="42" required> / '
@@ -141,35 +144,41 @@ class MyServer(BaseHTTPRequestHandler):
                 form_txt += '49<input type="radio" id="level49" name="level" value="49" required> / '
                 form_txt += '50<input type="radio" id="level50" name="level" value="50" required> <br><br> '
 
-                form_txt += '<label for="diffkr0">사용 난이도표 (45 이하는 팝픈위키만 가능합니다):   </label>'
+                form_txt += '<label for="diffkr0">사용 난이도표 :   </label>'
                 form_txt += '팝픈위키 서열값<input type="radio" name="diffkr" id="diffkr0" value="false" checked="checked" required> / '
-                form_txt += '한국 서열표<input type="radio" name="diffkr" id="diffkr1" value="true" required>  <br><br>'
+                form_txt += '한국 서열표<input type="radio" name="diffkr" id="diffkr1" value="true" required> <br>'
+                form_txt += ' ※ 45 이하는 팝픈위키 서열값만 사용 가능합니다. <br><br>'
 
                 form_txt += '<h3>필터 설정</h3>'
                 
-                form_txt += '필터를 적용할 경우, 설정된 메달/점수/랭크보다 높은 것에 적용됩니다. <br>'
-                form_txt += '필터를 적용하고 싶을 경우, 필터 방법에 꼭 필터 어둡게 / 도표에서 제거를 눌러주세요. <br>'
-                form_txt += '메달/점수/랭크 필터 중 하나만 적용하는 것을 추천합니다. <br><br>'
+                form_txt += '필터를 적용하고 싶을 경우, <b>필터 방법에 꼭 "어둡게" 혹은 "미표시"</b>를 눌러주세요. <br>'
+                form_txt += ' - 어둡게: 설정한 조건 이상의 채보가 어둡게 표시됩니다. (동별일 경우 퍼펙~동별)<br>'
+                form_txt += ' - 미표시: 설정한 조건 이상의 채보가 아예 도표에 표시되지 않습니다. <br>'
+                form_txt += ' ※ 메달/점수/랭크 필터 중 하나만 적용해 주세요. <br><br>'
 
                 form_txt += '<label for="filter0">필터 방법:   </label>'
                 form_txt += '필터 없음<input type="radio" name="filter" id="filter0" value="none" checked="checked" required> / '
-                form_txt += '필터 어둡게<input type="radio" name="filter" id="filter1" value="darken" required> / '
-                form_txt += '도표에서 제거<input type="radio" name="filter" id="filter2" value="disable" required>  <br><br>'
+                form_txt += '어둡게<input type="radio" name="filter" id="filter1" value="darken" required> / '
+                form_txt += '미표시<input type="radio" name="filter" id="filter2" value="disable" required>  <br><br>'
+
+                form_txt += '<label for="cond0">필터 조건:   </label>'
+                form_txt += '이상<input type="radio" name="cond" id="cond0" value="true" checked="checked" required> / '
+                form_txt += '이하<input type="radio" name="cond" id="cond1" value="false" required>  <br><br>'
 
                 form_txt += '<label for="fmedal00">메달 필터: </label>'
                 form_txt += '없음<input type="radio" id="fmedal00" name="fmedal" checked="checked" value="0" required> / '
-                form_txt += '<img src="/medal/1.png" width="20px"><input type="radio" id="fmedal01" name="fmedal" value="1" required> / '
-                form_txt += '<img src="/medal/2.png" width="20px"><input type="radio" id="fmedal02" name="fmedal" value="2" required> / '
-                form_txt += '<img src="/medal/3.png" width="20px"><input type="radio" id="fmedal03" name="fmedal" value="3" required> / '
-                form_txt += '<img src="/medal/4.png" width="20px"><input type="radio" id="fmedal04" name="fmedal" value="4" required> / '
-                form_txt += '<img src="/medal/5.png" width="20px"><input type="radio" id="fmedal05" name="fmedal" value="5" required> / '
-                form_txt += '<img src="/medal/6.png" width="20px"><input type="radio" id="fmedal06" name="fmedal" value="6" required> / '
-                form_txt += '<img src="/medal/7.png" width="20px"><input type="radio" id="fmedal07" name="fmedal" value="7" required> / '
-                form_txt += '<img src="/medal/8.png" width="20px"><input type="radio" id="fmedal08" name="fmedal" value="8" required> / '
-                form_txt += '<img src="/medal/9.png" width="20px"><input type="radio" id="fmedal09" name="fmedal" value="9" required> / '
-                form_txt += '<img src="/medal/10.png" width="20px"><input type="radio" id="fmedal10" name="fmedal" value="10" required> / '
-                form_txt += '<img src="/medal/11.png" width="20px"><input type="radio" id="fmedal11" name="fmedal" value="11" required> / '
-                form_txt += '<img src="/medal/12.png" width="20px"><input type="radio" id="fmedal12" name="fmedal" value="12" required>  <br><br>'
+                form_txt += '<img src="/medal/1e.png" width="20px"><input type="radio" id="fmedal01" name="fmedal" value="1" required> / '
+                form_txt += '<img src="/medal/2e.png" width="20px"><input type="radio" id="fmedal02" name="fmedal" value="2" required> / '
+                form_txt += '<img src="/medal/3e.png" width="20px"><input type="radio" id="fmedal03" name="fmedal" value="3" required> / '
+                form_txt += '<img src="/medal/4e.png" width="20px"><input type="radio" id="fmedal04" name="fmedal" value="4" required> / '
+                form_txt += '<img src="/medal/5e.png" width="20px"><input type="radio" id="fmedal05" name="fmedal" value="5" required> / '
+                form_txt += '<img src="/medal/6e.png" width="20px"><input type="radio" id="fmedal06" name="fmedal" value="6" required> / '
+                form_txt += '<img src="/medal/7e.png" width="20px"><input type="radio" id="fmedal07" name="fmedal" value="7" required> / '
+                form_txt += '<img src="/medal/8e.png" width="20px"><input type="radio" id="fmedal08" name="fmedal" value="8" required> / '
+                form_txt += '<img src="/medal/9e.png" width="20px"><input type="radio" id="fmedal09" name="fmedal" value="9" required> / '
+                form_txt += '<img src="/medal/10e.png" width="20px"><input type="radio" id="fmedal10" name="fmedal" value="10" required> / '
+                form_txt += '<img src="/medal/11e.png" width="20px"><input type="radio" id="fmedal11" name="fmedal" value="11" required> / '
+                form_txt += '<img src="/medal/12e.png" width="20px"><input type="radio" id="fmedal12" name="fmedal" value="12" required>  <br><br>'
                 
                 form_txt += '<label for="frank0">랭크 필터: </label>'
                 form_txt += '없음<input type="radio" id="frank0" name="frank" checked="checked" value="0" required> / '
@@ -192,9 +201,10 @@ class MyServer(BaseHTTPRequestHandler):
                 form_txt += '<label for="title">원하는 제목 (빈칸일시 기본값 사용): </label>'
                 form_txt += '<input type="text" id="title" name="title" value="">  <br><br>'
 
-                form_txt += '<label for="row">한 가로줄당 채보 수 (모바일: 4 추천 / 데스크탑: 8~12 추천 / 49, 50레벨: 4 추천): </label>'
+                form_txt += '<label for="row">한 가로줄당 표시 채보 수: </label>'
                 form_txt += '<input type="range" id="row" value="4" min="4" max="14" name="row" oninput="this.nextElementSibling.value = this.value">  '
-                form_txt += '<output>4</output><br><br>'
+                form_txt += '<output>4</output><br>'
+                form_txt += ' ※ 추천하는 설정 값입니다. 모바일용: 4 혹은 5 / PC: 8~12 / 48렙: 8, 49렙: 5, 50렙: 4 <br><br>'
                 
                 form_txt += '<label for="info0">플레이 수, 팝토모 아이디 표시:   </label>'
                 form_txt += '표시 안함<input type="radio" name="info" id="info0" value="false" required> / '
@@ -204,9 +214,13 @@ class MyServer(BaseHTTPRequestHandler):
                 form_txt += '일본어 원문<input type="radio" name="labelkr" id="labelkr0" value="false" required> / '
                 form_txt += '한국어 곡명(별명)<input type="radio" name="labelkr" id="labelkr1" value="true" checked="checked" required>  <br><br>'
 
+                form_txt += '<label for="kawaii0">팝군 귀엽게:   </label>'
+                form_txt += '안함 😭<input type="radio" name="kawaii" id="kawaii0" value="false" required> / '
+                form_txt += '함 😀<input type="radio" name="kawaii" id="kawaii1" value="true" checked="checked" required>  <br><br>'
+
                 form_txt += '<label for="sort0">정렬 방법:   </label>'
-                form_txt += '시리즈<input type="radio" name="sort" id="sort0" value="series" required> / '
-                form_txt += '일본어 제목<input type="radio" name="sort" id="sort1" value="title" checked="checked" required> / '
+                form_txt += '시리즈<input type="radio" name="sort" id="sort0" value="series" checked="checked" required> / '
+                form_txt += '일본어 제목<input type="radio" name="sort" id="sort1" value="title" required> / '
                 form_txt += '점수<input type="radio" name="sort" id="sort2" value="score" required> / '
                 form_txt += '메달<input type="radio" name="sort" id="sort3" value="medal" required>  <br><br>'
                 form_txt += '<br>'
@@ -234,14 +248,16 @@ class MyServer(BaseHTTPRequestHandler):
             diffkr = True if form.getvalue('diffkr') == "true" else False
             info = True if form.getvalue('info') == "true" else False
             labelkr = True if form.getvalue('labelkr') == "true" else False
+            kawaii = True if form.getvalue('kawaii') == "true" else False
+            better = True if form.getvalue('cond') == "true" else False
             if int(form.getvalue('level')) < 46:
                 diffkr = False
             # Check time for generation
             t0 = time.time()
-            pth = GenerateTable(form.getvalue("tomoID"), int(form.getvalue('level')), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), diffkr, info, labelkr, form.getvalue("title"), form.getvalue("sort"))
+            pth = GenerateTable(form.getvalue("tomoID"), int(form.getvalue('level')), int(form.getvalue('row')), form.getvalue('filter'), int(form.getvalue('fmedal')), int(form.getvalue('fscore')), int(form.getvalue('frank')), form.getvalue('tomoID'), diffkr, info, labelkr, form.getvalue("title"), form.getvalue("sort"), kawaii, better)
             t1 = time.time()
             logger.print(f"[Table Generated] @ {pth}, Elapsed time: {t1-t0:.2f}s")
-            logger.print(f"  Args: tomoID: {form.getvalue('tomoID')}, level: {form.getvalue('level')}, row: {form.getvalue('row')}, filter: {form.getvalue('filter')}, fmedal: {form.getvalue('fmedal')}, fscore: {form.getvalue('fscore')}, frank: {form.getvalue('frank')}, diffkr: {diffkr}, info: {info}, labelkr: {labelkr}, title: {form.getvalue('title')}, sort: {form.getvalue('sort')}")
+            logger.print(f"  Args: tomoID: {form.getvalue('tomoID')}, level: {form.getvalue('level')}, row: {form.getvalue('row')}, filter: {form.getvalue('filter')}, fmedal: {form.getvalue('fmedal')}, fscore: {form.getvalue('fscore')}, frank: {form.getvalue('frank')}, diffkr: {diffkr}, info: {info}, labelkr: {labelkr}, title: {form.getvalue('title')}, sort: {form.getvalue('sort')}, kawaii: {kawaii}, better: {better}")
             self.send_response(200)
             self.send_header("content-type", "text/html; charset=utf-8\r\n")
             self.end_headers()
@@ -267,7 +283,7 @@ if __name__ == "__main__":
     webServer = HTTPServer((hostName, serverPort), MyServer)
     sslctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     sslctx.check_hostname = False
-    sslctx.load_cert_chain(certfile='certificate.crt', keyfile="private.key")
+    sslctx.load_cert_chain(certfile='cert.crt', keyfile="priv.key")
     webServer.socket = sslctx.wrap_socket(webServer.socket, server_side=True)
     logger.print("Server started https://%s:%s" % (hostName, serverPort))
 
