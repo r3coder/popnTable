@@ -1,9 +1,4 @@
     /*
-    Copyright (c) 2024 r3c0d3r.com
-    Released under the MIT license
-    https://opensource.org/licenses/mit-license.php
-    */
-    /*
     Copyright (c) 2020 otoge-flow-flow.com
     Released under the MIT license
     https://opensource.org/licenses/mit-license.php
