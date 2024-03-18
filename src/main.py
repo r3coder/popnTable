@@ -79,7 +79,8 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("<h2>데이터 삭제를 희망하는 경우</h2>", "utf-8"))
             self.wfile.write(bytes('<p>서버에 저장된 플레이 데이터 삭제를 희망하는 경우, 위 문의처에 문의 바랍니다. (기능 구현중)</p>', "utf-8"))
             self.wfile.write(bytes('<br>', "utf-8"))
-            self.wfile.write(bytes('<p>소스 코드: <a href="https://github.com/r3coder/popnTable">Github</a></p>', "utf-8"))
+            self.wfile.write(bytes('<p>본 프로젝트의 소스 코드: <a href="https://github.com/r3coder/popnTable">Github</a>, MIT License</p>', "utf-8"))
+            self.wfile.write(bytes('<p>데이터 수집 코드 원본: <a href="https://otoge-flow-flow.com">otoge-flow-flow</a>, MIT License</p>', "utf-8"))
 
     
     def do_POST(self):
