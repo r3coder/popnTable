@@ -1,7 +1,7 @@
 # popnTable
 팝픈뮤직 서열표에 자신의 기록을 더해서 표기하는 프로그램입니다.
 
-[이_링크](https://popntable.mooo.com:3000)에서 직접 테스트 해 볼 수 있습니다.
+[이 링크](https://popntable.mooo.com:3000)에서 직접 테스트 해 볼 수 있습니다.
 
 # 사전 설정
 
@@ -67,7 +67,7 @@ certbot과 같은 것을 사용해서 설정하면 됩니다.
 
 # License
 
-본 프로그램에 포함된 소스 코드 및 메달 이미지는 [MIT_License](https://opensource.org/license/mit) 를 사용하고 있습니다.
+본 프로그램에 포함된 소스 코드 및 메달 이미지는 [MIT License](https://opensource.org/license/mit) 를 사용하고 있습니다.
 
 요약하면, 다음과 같은 권한을 가집니다.
 
