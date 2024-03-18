@@ -1,19 +1,19 @@
 # popnTable
 팝픈뮤직 서열표에 자신의 기록을 더해서 표기하는 프로그램입니다.
 
-[https://popntable.mooo.com:3000](이_링크)에서 직접 테스트 해 볼 수 있습니다.
+[이_링크](https://popntable.mooo.com:3000)에서 직접 테스트 해 볼 수 있습니다.
 
 # 사전 설정
 
 ## 1. 이미지 데이터 저장
 
-image 내부에 곡의 자켓 이미지를 받아야 합니다. [https://remywiki.com/](레미위키) / [https://popnmusic.fandom.com/](팝픈위키팬덤) 에 보통 있습니다.
+image 내부에 곡의 자켓 이미지를 받아야 합니다. [레미위키](https://remywiki.com/) / [팝픈위키팬덤](https://popnmusic.fandom.com/) 에 보통 있습니다.
 
 위 도메인에서는 직접 하나하나 이미지를 저장했습니다. 본 레포지토리에는 업로드하지 않았습니다. 만약 필요하신 분은 별도로 연락 부탁드립니다.
 
 ## 2. 레벨 데이터 저장
 
-`leveldata` 폴더 내부에는 각 레벨별 데이터를 tsv 형식으로 series / / genre / title / bpm / length / notes / diff_jp / label_kr / diff_kr / image_path / hardjudge 로 구분되어 저장하면 됩니다. [popn.wiki](팝픈위키)의 형식을 따르고 있습니다.
+`leveldata` 폴더 내부에는 각 레벨별 데이터를 tsv 형식으로 series / / genre / title / bpm / length / notes / diff_jp / label_kr / diff_kr / image_path / hardjudge 로 구분되어 저장하면 됩니다. [팝픈위키](popn.wiki)의 형식을 따르고 있습니다.
 
 예시: `[5]		レッスン(EX)	POP-STEP-UP	32～260	1:33	1008	強(+0.978±0.4)	팝 스텝 업	개인		o`
 
@@ -67,7 +67,7 @@ certbot과 같은 것을 사용해서 설정하면 됩니다.
 
 # License
 
-본 프로그램에 포함된 소스 코드 및 메달 이미지는 [https://opensource.org/license/mit](MIT_License) 를 사용하고 있습니다.
+본 프로그램에 포함된 소스 코드 및 메달 이미지는 [MIT_License](https://opensource.org/license/mit) 를 사용하고 있습니다.
 
 요약하면, 다음과 같은 권한을 가집니다.
 
