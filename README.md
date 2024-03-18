@@ -1,7 +1,7 @@
 # popnTable
 팝픈뮤직 서열표에 자신의 기록을 더해서 표기하는 프로그램입니다.
 
-[https://popntable.mooo.com:3000](이 링크)에서 직접 테스트 해 볼 수 있습니다.
+[https://popntable.mooo.com:3000](이_링크)에서 직접 테스트 해 볼 수 있습니다.
 
 # 사전 설정
 
@@ -17,7 +17,7 @@ image 내부에 곡의 자켓 이미지를 받아야 합니다. [https://remywik
 
 예시: `[5]		レッスン(EX)	POP-STEP-UP	32～260	1:33	1008	強(+0.978±0.4)	팝 스텝 업	개인		o`
 
-이 [https://docs.google.com/spreadsheets/d/1j9F6k-x06xxlOvE_IURBmjLPLHtiiiLHU2rDVpSPPCY/edit?usp=sharing](스프레드시트) 에 최신 데이터를 업데이트 후, 각 레벨을 tsv 형태로 저장해 해당 폴더에 넣으면 됩니다.
+[여기](https://docs.google.com/spreadsheets/d/1j9F6k-x06xxlOvE_IURBmjLPLHtiiiLHU2rDVpSPPCY)에서 최신 데이터를 업데이트 후, 각 레벨을 tsv 형태로 저장해 해당 폴더에 넣으면 됩니다.
 
 ## 3. 폰트 저장
 
